@@ -43,7 +43,7 @@ class ResPartner(models.Model):
             lazy=False,
         )
         for group in orders_group:
-            partner = self.browse(group["risk_partner_id"][0])
+            partner = self.browse(group["risk_partner_id"][0]).sudo()
             company = self.env["res.company"].browse(
                 group["company_id"][0] or self.env.company.id
             )
