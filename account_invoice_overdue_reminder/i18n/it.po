@@ -6,15 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-02-29 17:34+0000\n"
-"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
+"PO-Revision-Date: 2025-01-28 14:06+0000\n"
+"Last-Translator: Sergio Corato <sergiocorato@gmail.com>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.17\n"
+"X-Generator: Weblate 5.6.2\n"
 
 #. module: account_invoice_overdue_reminder
 #: model:mail.template,body_html:account_invoice_overdue_reminder.overdue_invoice_reminder_mail_template
@@ -45,7 +45,7 @@ msgid ""
 "        <th style=\"padding: 5px; border: 1px solid black;\">Past Reminders</"
 "th>\n"
 "    </tr>\n"
-"% for inv in object.invoice_ids.sorted(key='invoice_date'):\n"
+"% for inv in object.get_invoices().sorted(key='invoice_date'):\n"
 "    <tr style=\"background-color:\n"
 "        % if inv.move_type == 'out_refund':\n"
 "            LightGray\n"
@@ -53,12 +53,12 @@ msgid ""
 "    \">\n"
 "        <td style=\"padding: 5px; border: 1px solid black;\">${inv.name}</"
 "td>\n"
-"        <td style=\"padding: 5px; border: 1px solid black;\">"
-"${format_date(inv.invoice_date)}</td>\n"
+"        <td style=\"padding: 5px; border: 1px solid black;"
+"\">${format_date(inv.invoice_date)}</td>\n"
 "        <td style=\"padding: 5px; border: 1px solid black;\">${inv."
 "invoice_payment_term_id.name or ''}</td>\n"
-"        <td style=\"padding: 5px; border: 1px solid black;\">"
-"${format_date(inv.invoice_date_due)}</td>\n"
+"        <td style=\"padding: 5px; border: 1px solid black;"
+"\">${format_date(inv.invoice_date_due)}</td>\n"
 "        <td style=\"padding: 5px; border: 1px solid black;\">${inv.ref or ''}"
 "</td>\n"
 "        <td style=\"padding: 5px; border: 1px solid black;\">${dict(inv."
@@ -118,6 +118,108 @@ msgid ""
 "\n"
 "</div>\n"
 msgstr ""
+"\n"
+"<div style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"<p>Gentile cliente,</p>\n"
+"\n"
+"<p>In base ai nostri registri, il pagamento delle seguenti fatture è in "
+"ritardo:</p>\n"
+"\n"
+"<table style=\"border-spacing: 0; border-collapse: collapse; width: 100%; "
+"text-align: center;\">\n"
+"    <tr>\n"
+"\n"
+"        <th style=\"padding: 5px; border: 1px solid black;\">Numero "
+"Fattura</th>\n"
+"        <th style=\"padding: 5px; border: 1px solid black;\">Date "
+"Fattura</th>\n"
+"        <th style=\"padding: 5px; border: 1px solid black;\">Termini di "
+"pagamento</th>\n"
+"        <th style=\"padding: 5px; border: 1px solid black;\">Data di "
+"scadenza</th>\n"
+"        <th style=\"padding: 5px; border: 1px solid black;\">Rif. Ordine</th>"
+"\n"
+"        <th style=\"padding: 5px; border: 1px solid black;\">Tipo doc.</th>\n"
+"        <th style=\"padding: 5px; border: 1px solid black;\">Imponibile</th>"
+"\n"
+"        <th style=\"padding: 5px; border: 1px solid black;\">Totale</th>\n"
+"        <th style=\"padding: 5px; border: 1px solid black;\">Residuo</th>\n"
+"        <th style=\"padding: 5px; border: 1px solid black;\">Precedenti "
+"Richiami</th>\n"
+"    </tr>\n"
+"% for inv in object.get_invoices().sorted(key='invoice_date'):\n"
+"    <tr style=\"background-color:\n"
+"        % if inv.move_type == 'out_refund':\n"
+"            LightGray\n"
+"        % endif\n"
+"    \">\n"
+"        <td style=\"padding: 5px; border: 1px solid black;\">${inv.name}</td>"
+"\n"
+"        <td style=\"padding: 5px; border: 1px solid black;\""
+">${format_date(inv.invoice_date)}</td>\n"
+"        <td style=\"padding: 5px; border: 1px solid black;\">${"
+"inv.invoice_payment_term_id.name or ''}</td>\n"
+"        <td style=\"padding: 5px; border: 1px solid black;\""
+">${format_date(inv.invoice_date_due)}</td>\n"
+"        <td style=\"padding: 5px; border: 1px solid black;\">${inv.ref or "
+"''}</td>\n"
+"        <td style=\"padding: 5px; border: 1px solid black;\">${dict(inv."
+"fields_get(allfields=['move_type'])['move_type']['selection'])[inv."
+"move_type]}</td>\n"
+"        <td style=\"padding: 5px; border: 1px solid black; text-align: right;"
+"\">${format_amount(inv.amount_untaxed * (inv.move_type == 'out_refund' and -"
+"1 or 1), inv.currency_id)}</td>\n"
+"        <td style=\"padding: 5px; border: 1px solid black; text-align: right;"
+"\">${format_amount(inv.amount_total * (inv.move_type == 'out_refund' and -1 "
+"or 1), inv.currency_id)}</td>\n"
+"        <td style=\"padding: 5px; border: 1px solid black; text-align: right;"
+"\">${format_amount(inv.amount_residual * (inv.move_type == 'out_refund' and -"
+"1 or 1), inv.currency_id)}</td>\n"
+"        <td style=\"padding: 5px; border: 1px solid black;\">${inv."
+"overdue_reminder_counter}</td>\n"
+"    </tr>\n"
+"% endfor\n"
+"% for (currency, total_residual) in object.total_residual():\n"
+"    <tr>\n"
+"        <td></td>\n"
+"        <td></td>\n"
+"        <td></td>\n"
+"        <td></td>\n"
+"        <td></td>\n"
+"        <td></td>\n"
+"        <td colspan=\"2\" style=\"padding: 5px; border: 1px solid black; "
+"font-weight: bold; text-align: right;\">Totale Residuo in ${currency."
+"name}:</td>\n"
+"        <td style=\"padding: 5px; border: 1px solid black; font-weight: bold;"
+" text-align: right;\">${format_amount(total_residual, currency)}</td>\n"
+"        <td></td>\n"
+"    </tr>\n"
+"% endfor\n"
+"</table>\n"
+"\n"
+"<p>Se ha effettuato un pagamento per queste fatture pochi giorni fa, per "
+"favore ignori  questa email.</p>\n"
+"\n"
+"% if object.company_id.overdue_reminder_attach_invoice:\n"
+"<p>Troverà allegate le fatture scadute.</p>\n"
+"% endif\n"
+"\n"
+"% if object.counter > 2:\n"
+"<p>Nonostante i numerosi solleciti, siamo delusi nel constatare che queste "
+"fatture scadute non sono ancora state pagate. Al fine di evitare "
+"procedimenti legali, la invitiamo a saldare queste fatture scadute nei "
+"prossimi giorni.</p>\n"
+"% endif\n"
+"\n"
+"<p>Cordiali saluti,</p>\n"
+"\n"
+"% if user.signature:\n"
+"<p>\n"
+"${user.signature | safe}\n"
+"</p>\n"
+"% endif\n"
+"\n"
+"</div>\n"
 
 #. module: account_invoice_overdue_reminder
 #: model:mail.template,subject:account_invoice_overdue_reminder.overdue_invoice_reminder_mail_template
@@ -169,6 +271,8 @@ msgstr "Importo dovuto"
 msgid ""
 "An overdue reminder can only be attached to a customer invoice or credit note"
 msgstr ""
+"Un promemoria di scadenza può essere allegato solo ad una fattura o nota di "
+"credito cliente"
 
 #. module: account_invoice_overdue_reminder
 #: model_terms:ir.ui.view,arch_db:account_invoice_overdue_reminder.overdue_reminder_result_form
@@ -185,17 +289,17 @@ msgstr "Assegnato a"
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_res_company__overdue_reminder_attach_invoice
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_res_config_settings__overdue_reminder_attach_invoice
 msgid "Attach Invoices to Overdue Reminder E-mails"
-msgstr "Allega le fatture alle Emails di sollecito"
+msgstr "Allega le fatture alle e-mail di sollecito"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_step__result_notes
 msgid "Call Notes"
-msgstr "Note di chiamata"
+msgstr "Note chiamata"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_step__result_id
 msgid "Call Result/Info"
-msgstr "Risultato / Informazioni di chiamata"
+msgstr "Risultato / Informazioni chiamata"
 
 #. module: account_invoice_overdue_reminder
 #: model_terms:ir.ui.view,arch_db:account_invoice_overdue_reminder.overdue_reminder_mass_update_form
@@ -221,7 +325,7 @@ msgstr "Cc"
 #: model:ir.actions.act_window,name:account_invoice_overdue_reminder.mass_update_reminder_type_action
 #: model:ir.model.fields.selection,name:account_invoice_overdue_reminder.selection__overdue_reminder_mass_update__update_action__reminder_type
 msgid "Change Reminder Type"
-msgstr "Cambiare il tipo di promemoria"
+msgstr "Modifica tipo sollecito"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model,name:account_invoice_overdue_reminder.model_res_company
@@ -268,7 +372,7 @@ msgstr "Il contatore deve sempre essere positivo"
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_step__create_activity
 msgid "Create Activity"
-msgstr "Creare attività"
+msgstr "Crea attività"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_invoice_overdue_reminder__create_uid
@@ -295,7 +399,7 @@ msgstr "Creato il"
 #. module: account_invoice_overdue_reminder
 #: model_terms:ir.ui.view,arch_db:account_invoice_overdue_reminder.overdue_reminder_step_form
 msgid "Current Remind Counter"
-msgstr "Contatore attuale di sollecito"
+msgstr "Contatore sollecito corrente"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_invoice_overdue_reminder__action_commercial_partner_id
@@ -315,6 +419,14 @@ msgid ""
 "                    unreconciled payments/refunds have a good reason not to\n"
 "                    be reconciled with an open invoice."
 msgstr ""
+"Il cliente ha pagamenti/rimborsi non riconciliati. Dovresti\n"
+"                    reconciliare questi pagamenti/rimborsi e iniziare di "
+"nuovo il processo\n"
+"                    di promemoria delle scadenze, o verificare manualmente "
+"che questi\n"
+"                    pagamenti/rimborsi non riconciliati abbiamo un buon "
+"motivo per non\n"
+"                    essere riconciliati con una fattura aperta."
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_start__partner_ids
@@ -347,19 +459,19 @@ msgstr "Gentile Cliente,"
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_res_company__overdue_reminder_min_interval_days
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_res_config_settings__overdue_reminder_min_interval_days
 msgid "Default Overdue Reminder Minimum Interval (days)"
-msgstr "Intervallo minimo predefinito per promemoria ritardo (giorni)"
+msgstr "Intervallo minimo predefinito per sollecito (giorni)"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_res_company__overdue_reminder_start_days
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_res_config_settings__overdue_reminder_start_days
 msgid "Default Overdue Reminder Trigger Delay (days)"
-msgstr "Ritardo predefinito per attivazione del promemoria scadenza (giorni)"
+msgstr "Ritardo predefinito per attivazione del sollecito (giorni)"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_res_company__overdue_reminder_interface
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_res_config_settings__overdue_reminder_interface
 msgid "Default Overdue Reminder Wizard Interface"
-msgstr "Interfaccia procedura guidata per promemoria predefinito"
+msgstr "Interfaccia procedura guidata per sollecito predefinito"
 
 #. module: account_invoice_overdue_reminder
 #: model_terms:ir.ui.view,arch_db:account_invoice_overdue_reminder.view_account_config_settings
@@ -383,27 +495,22 @@ msgid ""
 "invoices are still unpaid. In order to avoid legal proceedings, we urge you "
 "to paid these overdue invoices in the next days."
 msgstr ""
-"Nonostante i numerosi solleciti, siamo delusi nel constatare che queste "
-"fatture scadute non sono ancora state pagate. Al fine di evitare "
-"procedimenti legali, la invitiamo a saldare queste fatture scadute nei "
-"prossimi giorni."
+"Nonostante diversi solleciti, siamo rammaricati nel constatare che le "
+"fatture scadute non sono ancora state pagate. Per evitare procedimenti "
+"legali, sollecitiamo il pagamento delle fatture citate nei prossimi giorni."
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_res_partner__no_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_res_users__no_overdue_reminder
 msgid "Disable Overdue Invoice Reminder"
-msgstr ""
-"Nonostante i numerosi solleciti, siamo delusi nel constatare che queste "
-"fatture scadute non sono ancora state pagate. Al fine di evitare "
-"procedimenti legali, la invitiamo a saldare queste fatture scadute nei "
-"prossimi giorni."
+msgstr "Disabilitare solleciti fatture scadute"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_bank_statement_line__no_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_move__no_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_payment__no_overdue_reminder
 msgid "Disable Overdue Reminder"
-msgstr "Disabilitare il promemoria di pagamento in ritardo"
+msgstr "Disabilitare sollecito"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_invoice_overdue_reminder__display_name
@@ -447,7 +554,7 @@ msgstr "E-mail"
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_invoice_overdue_reminder__action_mail_state
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_action__mail_state
 msgid "E-mail Status"
-msgstr "Stato E-mail"
+msgstr "Stato e-mail"
 
 #. module: account_invoice_overdue_reminder
 #: code:addons/account_invoice_overdue_reminder/wizard/overdue_reminder_wizard.py:0
@@ -478,13 +585,13 @@ msgstr "Per il sollecito del cliente '%s', manca la scadenza per l'attività."
 msgid ""
 "For the reminder of customer '%s', you must assign someone for the activity."
 msgstr ""
-"Per il sollecito del cliente '%s', devi assegnare qualcuno per l'attività."
+"Per il sollecito del cliente '%s', bisogna assegnare qualcuno per l'attività."
 
 #. module: account_invoice_overdue_reminder
 #: code:addons/account_invoice_overdue_reminder/wizard/overdue_reminder_wizard.py:0
 #, python-format
 msgid "Good job!"
-msgstr "Ben fatto!"
+msgstr "Ottimo lavoro!"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_invoice_overdue_reminder__id
@@ -507,8 +614,8 @@ msgid ""
 "If you made a payment for these invoices a few days ago, please ignore this "
 "letter."
 msgstr ""
-"Se hai effettuato un pagamento per queste fatture pochi giorni fa, per "
-"favore ignora questa lettera."
+"Se il pagamento per queste fatture è stato effettuato pochi giorni fa, si "
+"prega di ignorare questa lettera."
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_invoice_overdue_reminder__action_result_id
@@ -571,7 +678,7 @@ msgstr "Risultati promemoria fatture"
 #. module: account_invoice_overdue_reminder
 #: model:overdue.reminder.result,name:account_invoice_overdue_reminder.invoice_dispute
 msgid "Invoice dispute"
-msgstr "Fattura contestata"
+msgstr "Contestazione fattura"
 
 #. module: account_invoice_overdue_reminder
 #: model:overdue.reminder.result,name:account_invoice_overdue_reminder.invoice_in_payment_pipe
@@ -597,7 +704,7 @@ msgstr "Fatture"
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_step__partner_id
 #: model_terms:ir.ui.view,arch_db:account_invoice_overdue_reminder.overdue_reminder_step_form
 msgid "Invoicing Contact"
-msgstr "Contatto per fatturazione"
+msgstr "Contatto fatturazione"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_start_payment__journal_id
@@ -612,17 +719,17 @@ msgstr "Registrazione contabile"
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_start_payment__last_entry_date
 msgid "Last Entry"
-msgstr "Ultima registrazione contabile"
+msgstr "Ultima registrazione"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_start_payment__last_entry_create_uid
 msgid "Last Entry Created by"
-msgstr "Ultima registrazione contabile creata da"
+msgstr "Ultima registrazione creata da"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_start_payment__last_entry_create_date
 msgid "Last Entry Created on"
-msgstr "Ultima registrazione contabile creata il"
+msgstr "Ultima registrazione creata il"
 
 #. module: account_invoice_overdue_reminder
 #: code:addons/account_invoice_overdue_reminder/models/res_company.py:0
@@ -650,7 +757,7 @@ msgstr "Ultima modifica il"
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_move__overdue_reminder_last_date
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_payment__overdue_reminder_last_date
 msgid "Last Overdue Reminder Date"
-msgstr "Data ultimo promemoria di scadenza"
+msgstr "Data ultimo sollecito"
 
 #. module: account_invoice_overdue_reminder
 #: code:addons/account_invoice_overdue_reminder/models/res_company.py:0
@@ -738,7 +845,7 @@ msgstr "Nome"
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_step__counter
 msgid "New Remind Counter"
-msgstr "Numero del nuovo promemoria"
+msgstr "Contatore nuovi promemoria"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_mass_update__reminder_type
@@ -768,7 +875,7 @@ msgid ""
 "reminder for some of the same overdue invoices less than N days ago (N = "
 "Minimum Delay Since Last Reminder)."
 msgstr ""
-"Odoo non proporrà di inviare un promemoria a un cliente che ha già ricevuto "
+"Odoo non proporrà di inviare un promemoria ad un cliente che ha già ricevuto "
 "un promemoria per alcune delle fatture scadute meno di N giorni fa (N = "
 "Ritardo minimo dall'ultimo promemoria)."
 
@@ -778,8 +885,8 @@ msgid ""
 "Odoo will propose to send an overdue reminder to a customer if it has at "
 "least one invoice which is overdue for more than N days (N = trigger delay)."
 msgstr ""
-"Odoo proporrà di inviare un promemoria a un cliente se ha almeno una fattura "
-"scaduta da più di N giorni (N = Ritardo attivazione)."
+"Odoo proporrà di inviare un promemoria ad un cliente se ha almeno una "
+"fattura che è scaduta da più di N giorni (N= ritardo di attivazione)."
 
 #. module: account_invoice_overdue_reminder
 #: code:addons/account_invoice_overdue_reminder/models/res_company.py:0
@@ -795,12 +902,12 @@ msgstr "Opzioni"
 #. module: account_invoice_overdue_reminder
 #: model_terms:ir.ui.view,arch_db:account_invoice_overdue_reminder.overdue_reminder_step_form
 msgid "Order Ref"
-msgstr "Rif fattura"
+msgstr "Rif. ordine"
 
 #. module: account_invoice_overdue_reminder
 #: model_terms:ir.ui.view,arch_db:account_invoice_overdue_reminder.report_overdue_reminder_document
 msgid "Order Ref."
-msgstr "Rif. fattura"
+msgstr "Rif. ordine"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_bank_statement_line__overdue
@@ -818,7 +925,7 @@ msgstr "Il contatore delle fatture scadute deve essere sempre positivo"
 #: model:ir.actions.act_window,name:account_invoice_overdue_reminder.overdue_reminder_start_action
 #: model:ir.ui.menu,name:account_invoice_overdue_reminder.overdue_reminder_start_menu
 msgid "Overdue Invoice Remind"
-msgstr "Ricordare fattura scaduta"
+msgstr "Promemoria fattura scaduta"
 
 #. module: account_invoice_overdue_reminder
 #: model_terms:ir.ui.view,arch_db:account_invoice_overdue_reminder.view_account_config_settings
@@ -839,7 +946,7 @@ msgstr "Risultato/Informazioni del promemoria di fattura scaduta"
 #: model:ir.actions.act_window,name:account_invoice_overdue_reminder.overdue_reminder_step_mass_action
 #: model:ir.actions.act_window,name:account_invoice_overdue_reminder.overdue_reminder_step_onebyone_action
 msgid "Overdue Invoice Step"
-msgstr "Passo per fattura scaduta"
+msgstr "Passo fattura scaduta"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_step__invoice_ids
@@ -849,7 +956,7 @@ msgstr "Fatture scadute"
 #. module: account_invoice_overdue_reminder
 #: model:ir.actions.report,name:account_invoice_overdue_reminder.overdue_reminder_step_report
 msgid "Overdue Letter"
-msgstr "Lettera per scadenza"
+msgstr "Lettera scadenza"
 
 #. module: account_invoice_overdue_reminder
 #: model_terms:ir.ui.view,arch_db:account_invoice_overdue_reminder.view_move_form
@@ -860,7 +967,7 @@ msgstr "Promemoria scadenza"
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_invoice_overdue_reminder__action_id
 msgid "Overdue Reminder Action"
-msgstr "Azione per promemoria scadenza"
+msgstr "Azione promemoria scadenza"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model,name:account_invoice_overdue_reminder.model_overdue_reminder_action
@@ -868,12 +975,12 @@ msgstr "Azione per promemoria scadenza"
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_move__overdue_reminder_ids
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_payment__overdue_reminder_ids
 msgid "Overdue Reminder Action History"
-msgstr "Storico azioni di promemoria scadenza"
+msgstr "Storico azione promemoria scadenza"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.actions.act_window,name:account_invoice_overdue_reminder.action_overdue_reminder_action
 msgid "Overdue Reminder Actions"
-msgstr "Azioni di promemoria scadenza"
+msgstr "Azioni promemoria scadenza"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_bank_statement_line__overdue_reminder_counter
@@ -881,14 +988,12 @@ msgstr "Azioni di promemoria scadenza"
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_payment__overdue_reminder_counter
 #: model_terms:ir.ui.view,arch_db:account_invoice_overdue_reminder.view_account_invoice_filter
 msgid "Overdue Reminder Count"
-msgstr "Numero dei promemoria scadenza"
+msgstr "Conteggio promemoria scadenza"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.constraint,message:account_invoice_overdue_reminder.constraint_res_company_overdue_reminder_min_interval_days_positive
 msgid "Overdue Reminder Minimum Interval must always be strictly positive"
-msgstr ""
-"L'intervallo minimo di promemoria scadenza deve sempre essere strettamente "
-"positivo"
+msgstr "L'intervallo minimo di promemoria scadenza deve sempre essere positivo"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.constraint,message:account_invoice_overdue_reminder.constraint_res_company_overdue_reminder_start_days_positive
@@ -899,12 +1004,12 @@ msgstr ""
 #. module: account_invoice_overdue_reminder
 #: model:ir.model,name:account_invoice_overdue_reminder.model_overdue_reminder_step
 msgid "Overdue reminder wizard step"
-msgstr "Passo della procedura di promemoria scadenza"
+msgstr "Passo procedura guidata promemoria scadenza"
 
 #. module: account_invoice_overdue_reminder
 #: model_terms:ir.ui.view,arch_db:account_invoice_overdue_reminder.report_overdue_reminder_document
 msgid "Past Reminders"
-msgstr "Promemoria passati"
+msgstr "Promemoria precedenti"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_start__payment_ids
@@ -924,7 +1029,7 @@ msgstr "Pagamento inviato"
 #. module: account_invoice_overdue_reminder
 #: model_terms:ir.ui.view,arch_db:account_invoice_overdue_reminder.overdue_reminder_start_form
 msgid "Payments up-to-date ?"
-msgstr "I pagamenti sono aggiornati?"
+msgstr "Pagamenti aggiornati?"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_invoice_overdue_reminder__action_user_id
@@ -945,7 +1050,7 @@ msgstr "Telefono"
 #: model_terms:ir.ui.view,arch_db:account_invoice_overdue_reminder.account_invoice_overdue_reminder_search
 #: model_terms:ir.ui.view,arch_db:account_invoice_overdue_reminder.overdue_reminder_action_search
 msgid "Post"
-msgstr "Posta"
+msgstr "Invia"
 
 #. module: account_invoice_overdue_reminder
 #: model_terms:ir.ui.view,arch_db:account_invoice_overdue_reminder.overdue_reminder_step_form
@@ -961,7 +1066,7 @@ msgstr "Stampa fatture scadute"
 #: code:addons/account_invoice_overdue_reminder/wizard/overdue_reminder_wizard.py:0
 #, python-format
 msgid "Remind letter hasn't been printed!"
-msgstr "La lettera di promemoria non è stata stampata!"
+msgstr "La lettera promemoria non è stata stampata!"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_action__reminder_ids
@@ -972,12 +1077,12 @@ msgstr "Promemoria"
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_account_invoice_overdue_reminder__action_mail_id
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_action__mail_id
 msgid "Reminder E-mail"
-msgstr "E-mail di promemoria"
+msgstr "E-mail promemoria"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_step__reminder_type
 msgid "Reminder Type"
-msgstr "Tipo di promemoria"
+msgstr "Tipo promemoria"
 
 #. module: account_invoice_overdue_reminder
 #: model_terms:ir.ui.view,arch_db:account_invoice_overdue_reminder.report_overdue_reminder_document
@@ -1035,7 +1140,7 @@ msgstr "Stato"
 #. module: account_invoice_overdue_reminder
 #: model:ir.model,name:account_invoice_overdue_reminder.model_overdue_reminder_start_payment
 msgid "Status of payments"
-msgstr "Situazione dei pagamenti"
+msgstr "Stato dei pagamenti"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_step__mail_subject
@@ -1068,13 +1173,13 @@ msgstr ""
 #: code:addons/account_invoice_overdue_reminder/wizard/overdue_reminder_wizard.py:0
 #, python-format
 msgid "The trigger delay cannot be negative."
-msgstr "Il ritardo attivazione non può essere negativo."
+msgstr "Il ritardo di azione non può essere negativo."
 
 #. module: account_invoice_overdue_reminder
 #: code:addons/account_invoice_overdue_reminder/wizard/overdue_reminder_wizard.py:0
 #, python-format
 msgid "There are no invoices to remind for customer '%s'."
-msgstr "Non ci sono fatture da ricordare al cliente '%s'."
+msgstr "Non ci sono fatture da sollecitare al cliente '%s'."
 
 #. module: account_invoice_overdue_reminder
 #: code:addons/account_invoice_overdue_reminder/wizard/overdue_reminder_wizard.py:0
@@ -1098,7 +1203,7 @@ msgstr "Questa fattura cliente è scaduta."
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.constraint,message:account_invoice_overdue_reminder.constraint_overdue_reminder_result_name_unique
 msgid "This overdue reminder result already exists"
-msgstr "Questo risultato di promemoria fattura scaduta esiste già"
+msgstr "Questo risultato sollecito esiste già"
 
 #. module: account_invoice_overdue_reminder
 #: model_terms:ir.ui.view,arch_db:account_invoice_overdue_reminder.overdue_reminder_step_form
@@ -1132,12 +1237,12 @@ msgstr "Tipo"
 #. module: account_invoice_overdue_reminder
 #: model:overdue.reminder.result,name:account_invoice_overdue_reminder.unreachable
 msgid "Unreachable"
-msgstr "Irrecuperabile"
+msgstr "Non raggiungibile"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_step__warn_unreconciled_move_line_ids
 msgid "Unreconciled Payments/Refunds"
-msgstr "Pagamenti/Rimborsi non conciliati"
+msgstr "Pagamenti / Rimborsi non riconciliati"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_mass_update__update_action
@@ -1183,24 +1288,24 @@ msgstr "Procedura guidata"
 #. module: account_invoice_overdue_reminder
 #: model:ir.model.fields,field_description:account_invoice_overdue_reminder.field_overdue_reminder_start__interface
 msgid "Wizard Interface"
-msgstr "Interfaccia procedura"
+msgstr "Interfaccia procedura guidata"
 
 #. module: account_invoice_overdue_reminder
 #: model:ir.model,name:account_invoice_overdue_reminder.model_overdue_reminder_start
 msgid "Wizard to reminder overdue customer invoice"
-msgstr "Procedura per ricordare le fatture scadute dei clienti"
+msgstr "Procedura guidata per ricordare le fatture scadute dei clienti"
 
 #. module: account_invoice_overdue_reminder
 #: code:addons/account_invoice_overdue_reminder/wizard/overdue_reminder_wizard.py:0
 #, python-format
 msgid "You must select the new reminder type."
-msgstr "Devi selezionare il nuovo tipo di promemoria."
+msgstr "Bisogna selezionare il nuovo tipo di promemoria."
 
 #. module: account_invoice_overdue_reminder
 #: code:addons/account_invoice_overdue_reminder/wizard/overdue_reminder_wizard.py:0
 #, python-format
 msgid "You processed all your overdue invoice reminders."
-msgstr "Hai elaborato tutti i promemoria di fatture scadute."
+msgstr "Sono stati elaborati tutti i promemoria di fatture scadute."
 
 #. module: account_invoice_overdue_reminder
 #: model_terms:ir.ui.view,arch_db:account_invoice_overdue_reminder.report_overdue_reminder_document
@@ -1245,12 +1350,12 @@ msgstr "giorni"
 #~ "    <tr>\n"
 #~ "        <td style=\"padding: 5px; border: 1px solid black;\">${inv.name}</"
 #~ "td>\n"
-#~ "        <td style=\"padding: 5px; border: 1px solid black;\">"
-#~ "${format_date(inv.invoice_date)}</td>\n"
+#~ "        <td style=\"padding: 5px; border: 1px solid black;"
+#~ "\">${format_date(inv.invoice_date)}</td>\n"
 #~ "        <td style=\"padding: 5px; border: 1px solid black;\">${inv."
 #~ "invoice_payment_term_id.name or ''}</td>\n"
-#~ "        <td style=\"padding: 5px; border: 1px solid black;\">"
-#~ "${format_date(inv.invoice_date_due)}</td>\n"
+#~ "        <td style=\"padding: 5px; border: 1px solid black;"
+#~ "\">${format_date(inv.invoice_date_due)}</td>\n"
 #~ "        <td style=\"padding: 5px; border: 1px solid black;\">${inv.ref or "
 #~ "''}</td>\n"
 #~ "        <td style=\"padding: 5px; border: 1px solid black; text-align: "
@@ -1339,12 +1444,12 @@ msgstr "giorni"
 #~ "    <tr>\n"
 #~ "        <td style=\"padding: 5px; border: 1px solid black;\">${inv.name}</"
 #~ "td>\n"
-#~ "        <td style=\"padding: 5px; border: 1px solid black;\">"
-#~ "${format_date(inv.invoice_date)}</td>\n"
+#~ "        <td style=\"padding: 5px; border: 1px solid black;"
+#~ "\">${format_date(inv.invoice_date)}</td>\n"
 #~ "        <td style=\"padding: 5px; border: 1px solid black;\">${inv."
 #~ "invoice_payment_term_id.name or ''}</td>\n"
-#~ "        <td style=\"padding: 5px; border: 1px solid black;\">"
-#~ "${format_date(inv.invoice_date_due)}</td>\n"
+#~ "        <td style=\"padding: 5px; border: 1px solid black;"
+#~ "\">${format_date(inv.invoice_date_due)}</td>\n"
 #~ "        <td style=\"padding: 5px; border: 1px solid black;\">${inv.ref or "
 #~ "''}</td>\n"
 #~ "        <td style=\"padding: 5px; border: 1px solid black; text-align: "
